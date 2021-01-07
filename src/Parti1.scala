@@ -41,4 +41,44 @@ class Parti1 {
 	 	    println( "Occurence porte Dest: " + occ_PortDest.size  + ", Taille of array porte dest:  " + arrayPortDest.size)
 	 	    println( "Occurence porte Protocol: " + occ_Protocol.size  + ", Taille of array protocol:  " + arrayProtocol.size)
 	 	  }
+	 	  
+	 	  
+	 	  //get sum, mean, min max  of type collum numeric
+	 	  def quest3_getCalcul(){
+	 	    //here var = varible , NOT use VAL 
+	 	    var minDuree = arrayDuree.min
+	 	    var maxDuree = arrayDuree.max
+	 	    var minPaquet = arrayPackageNumber.min
+	 	    var maxPaquet = arrayPackageNumber.max
+	 	    var minOctet = arrayOctetNumber.min
+	 	    var maxOctet = arrayOctetNumber.max
+	 	    
+	 	    var sumDuree :Long = 1
+	 	    var sumPaquet = 0
+	 	    var sumOctet = 0
+	 	    for (i <-0 to arrayDuree.size - 1){
+	 	     sumDuree += arrayDuree(i).toLong
+	 	     sumPaquet += arrayPackageNumber(i)
+	 	     sumOctet += arrayOctetNumber(i)
+	 	    
+	 	    }
+	 	    
+	 	    var meanDuree = sumDuree/arrayDuree.size
+	 	    var meanPaquet = sumPaquet/arrayPackageNumber.size
+	 	    var meanOctet = sumOctet/arrayOctetNumber.size
+	 	    	 	    
+	 	    
+	 	    println( "Durre Min, Max ,Sum , Mean: " + minDuree  + ", " + maxDuree + ", " + sumDuree + ", "+ meanDuree )
+	 	    println( "Paquet Min, Max ,Sum , Mean: " + minPaquet + ", " + maxPaquet+ ", " + sumPaquet + ", "+ meanPaquet )
+	 	    println( "Octer Min, Max ,Sum , Mean: " + minOctet  + ", " + maxOctet + ", " + sumOctet+ ", "+ meanOctet)
+	 	    
+	 	  }
+	 	  
+	 	  
+	 	  
+	 	  
+	 	  
+	 	  
+	 	  
+	 	  
 }
