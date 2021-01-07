@@ -31,6 +31,7 @@ class Parti1 {
   				}
   	  }
 	 	  
+	 	  // convert array to set  = > no duplication of values so we have the frequency
 	 	  def quest2_occurences(){
 	 	    val occ_PortSource = arrayPortSource.toSet
 	 	    val occ_PortDest = arrayPortDest.toSet
