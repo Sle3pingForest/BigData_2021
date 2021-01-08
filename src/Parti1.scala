@@ -1,5 +1,7 @@
 import scala.io.Source;
 import scala.collection.mutable.ArrayBuffer
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkConf
 
 class Parti1 {
 
@@ -12,25 +14,37 @@ class Parti1 {
 			val arrayProtocol = ArrayBuffer[String]()
 			val arrayPackageNumber = ArrayBuffer[Integer]()
 			val arrayOctetNumber = ArrayBuffer[Integer]()
-
+			
+	 	    val conf = new SparkConf().setAppName("Spark Scala WordCount Example").setMaster("local[1]") 
+	      val sc = new SparkContext(conf) 
+	      
 
 			def quest1_readFile(path : String){ 
 		//read file
-  		val bufferedSource = Source.fromFile(path)
-  				for ( line <- bufferedSource.getLines){
-  					val l = line.split(",")
-  							arrayTimeStamp += l(0)
-  							arrayDuree += l(1).toInt
-  							arrayPcsource += l(2)
-  							arrayPortSource += l(3)
-  							arrayPcDest += l(4)
-  							arrayPortDest += l(5)
-  							arrayProtocol +=  l(6)
-  							arrayPackageNumber += l(7).toInt
-  							arrayOctetNumber += l(8).toInt
-  				}
-  	  }
-	 	  
+	
+	  
+	      var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(0),fields(1),fields(2),fields(3),fields(4),fields(5),fields(6),fields(7),fields(8)))
+	      println(list.count().toInt)
+	      
+	      println(list.take(50)(0))
+	      println(list.take(1)(0))
+	     for ( j <- 1 to list.count().toInt){
+      			arrayTimeStamp += list.take(j)(0)._1
+      			arrayDuree += list.take(j)(0)._2.toInt
+      			arrayPcsource  += list.take(j)(0)._3
+      			arrayPortSource += list.take(j)(0)._4
+      			arrayPcDest  += list.take(j)(0)._5
+      			arrayPortDest += list.take(j)(0)._6
+      			arrayProtocol  += list.take(j)(0)._7
+      			arrayPackageNumber  += list.take(j)(0)._8.toInt
+      			arrayOctetNumber  += list.take(j)(0)._9.toInt
+			
+  			
+  			}
+	}
+  			
+  	  
+	 	
 	 	  // convert array to set  = > no duplication of values so we have the frequency
 	 	  def quest2_occurences(){
 	 	    val occ_PortSource = arrayPortSource.toSet
@@ -77,8 +91,5 @@ class Parti1 {
 	 	  
 	 	  
 	 	  
-	 	  
-	 	  
-	 	  
-	 	  
+	
 }
