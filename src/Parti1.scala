@@ -94,14 +94,14 @@ class Parti1  extends java.io.Serializable{
 
 				var taille = list.count().toInt
 				for ( line <- list.take(taille)){
-					println(line)
+					println(line) // (C1685,CompactBuffer((6,4,2749), (6,6,2980), (6,6,2972)))
 
 					var nbdeConnexion = 0 
 
 					val arrayDuree = ListBuffer[Integer]()
 					val arrayOctet= ListBuffer[Integer]()
 					val arrayPaquet = ListBuffer[Integer]()
-					var v =   line._2.toArray //Convert to array
+					var v =   line._2.toArray //Convert to array : CompactBuffer((6,4,2749), (6,6,2980), (6,6,2972)) 
 					var totalDuree = 0
 					var totalPaquet = 0
 					var totalOctet = 0
@@ -129,5 +129,21 @@ class Parti1  extends java.io.Serializable{
 							totalPaquet +", OctetTotal: " +  totalOctet +", DureMoyen: " + meanDure +",PaquetMoyen:"+ meanPaquet + ", OctetMoyen:" + meanOctet)	 
 				}
 	}
+	
 
+		def quest6(path : String){
+		//var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(0),fields(1),fields(2),fields(3),fields(4),fields(5),fields(6),fields(7),fields(8)))
+
+		    val conf = new SparkConf().setAppName("Spark Scala WordCount Example").setMaster("local[1]") 
+				val sc = new SparkContext(conf) 
+				var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(2),(fields(3),fields(4),fields(5), fields(5)))).groupByKey()
+	      var taille = list.count().toInt
+				for ( line <- list.take(taille)){
+					println(line)
+					var occRest =   line._2.toArray.toSet
+					
+					println( "Ordinateur source: " + line._1 + ", Occurence des reste: "+ occRest.size)
+				}
+				
+		}
 }
