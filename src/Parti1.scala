@@ -87,51 +87,47 @@ class Parti1  extends java.io.Serializable{
 
 	def quest5(path : String){
 		//var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(0),fields(1),fields(2),fields(3),fields(4),fields(5),fields(6),fields(7),fields(8)))
-		
-			val conf = new SparkConf().setAppName("Spark Scala WordCount Example").setMaster("local[1]") 
-			val sc = new SparkContext(conf) 
-	    var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(2),(fields(1),fields(7),fields(8))))
-				var listSort = list.groupByKey()
-				var ordicount =  listSort.count().toInt
 
-				for (i <-1 to ordicount){
-					println(listSort.take(5)(0))
-				}
+		val conf = new SparkConf().setAppName("Spark Scala WordCount Example").setMaster("local[1]") 
+				val sc = new SparkContext(conf) 
+				var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(2),(fields(1),fields(7),fields(8)))).groupByKey()
 
-		/*
-				var nbdeConnexion = 0 
-				for (i <-1 to ordicount){
+				var taille = list.count().toInt
+				for ( line <- list.take(taille)){
+					println(line)
+
+					var nbdeConnexion = 0 
 
 					val arrayDuree = ListBuffer[Integer]()
-							val arrayOctet= ListBuffer[Integer]()
-							val arrayPaquet = ListBuffer[Integer]()
-							var v =   listSort.take(2)(0)._2.toArray //Convert to array
-							var totalDuree = 0
-							var totalPaquet = 0
-							var totalOctet = 0
-							var meanDure = 0
-							var meanPaquet =0
-							var meanOctet = 0
-							nbdeConnexion = v.size
-							for (j <- 1 to v.size -1){
-								arrayDuree += v(j)._1.toInt
-										arrayOctet += v(j)._2.toInt
-										arrayPaquet +=v(j)._3.toInt
+					val arrayOctet= ListBuffer[Integer]()
+					val arrayPaquet = ListBuffer[Integer]()
+					var v =   line._2.toArray //Convert to array
+					var totalDuree = 0
+					var totalPaquet = 0
+					var totalOctet = 0
+					var meanDure = 0
+					var meanPaquet =0
+					var meanOctet = 0
+					nbdeConnexion = v.size
+					for (j <- 0 to v.size -1){
+						arrayDuree += v(j)._1.toInt
+								arrayOctet += v(j)._2.toInt
+								arrayPaquet +=v(j)._3.toInt
 
-										totalDuree += v(j)._1.toInt
-										totalPaquet += v(j)._2.toInt
-										totalOctet += v(j)._3.toInt
-										meanDure = totalDuree/v.size
-										meanPaquet = totalPaquet/v.size
-										meanOctet =  totalOctet/v.size
-							}	    
+								totalDuree += v(j)._1.toInt
+								totalPaquet += v(j)._2.toInt
+								totalOctet += v(j)._3.toInt
+								meanDure = totalDuree/v.size
+								meanPaquet = totalPaquet/v.size
+								meanOctet =  totalOctet/v.size
+					}	 
 
 
-				println( "Ordinateur source: " + listSort.take(2)(0)._1  + ", Duree Max:" + arrayDuree.max + ", Duree Min:" + 
-					arrayDuree.min + ", Octet Min: "+ arrayOctet.min + ", Octet Max: "+ arrayOctet.max + ", Paquet Min:" + 
-					arrayPaquet.min + ", Octet Max: " + arrayPaquet.max + ", DureTotal: "+ totalDuree + ", PaquetTotal: "+ 
-					totalPaquet +", OctetTotal: " +  totalOctet +", DureMoyen: " + meanDure +",PaquetMoyen:"+ meanPaquet + ", OctetMoyen:" + meanOctet)	 
-				}*/
-	}	 	  
+					println( "Ordinateur source: " + line._1  + ", Duree Max:" + arrayDuree.max + ", Duree Min:" + 
+							arrayDuree.min + ", Octet Min: "+ arrayOctet.min + ", Octet Max: "+ arrayOctet.max + ", Paquet Min:" + 
+							arrayPaquet.min + ", Octet Max: " + arrayPaquet.max + ", DureTotal: "+ totalDuree + ", PaquetTotal: "+ 
+							totalPaquet +", OctetTotal: " +  totalOctet +", DureMoyen: " + meanDure +",PaquetMoyen:"+ meanPaquet + ", OctetMoyen:" + meanOctet)	 
+				}
+	}
 
 }
