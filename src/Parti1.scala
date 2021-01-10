@@ -131,19 +131,40 @@ class Parti1  extends java.io.Serializable{
 	}
 	
 
-		def quest6(path : String){
+		def quest6_7(path : String){
 		//var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(0),fields(1),fields(2),fields(3),fields(4),fields(5),fields(6),fields(7),fields(8)))
-
 		    val conf = new SparkConf().setAppName("Spark Scala WordCount Example").setMaster("local[1]") 
 				val sc = new SparkContext(conf) 
-				var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(2),(fields(3),fields(4),fields(5), fields(5)))).groupByKey()
+				val list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(2),(fields(3),fields(4),fields(5), fields(6)))).groupByKey()
 	      var taille = list.count().toInt
 				for ( line <- list.take(taille)){
-					println(line)
-					var occRest =   line._2.toArray.toSet
+				  
+		      val transf = sc.parallelize(line._2.toSeq, 1) // parallelize pour conserver la notion RDD sinon le reduckey ne marche pas
+		      
+					val countsPortSource = transf.flatMap(v => v._1.split(",")).map(word => (word,1))
+					val countsDest = transf.flatMap(v => v._2.split(",")).map(word => (word,1))
+					val countsPortDest = transf.flatMap(v => v._3.split(",")).map(word => (word,1))
+					val countsProtocol = transf.flatMap(v => v._4.split(",")).map(word => (word,1))
 					
-					println( "Ordinateur source: " + line._1 + ", Occurence des reste: "+ occRest.size)
+					
+		      val freqDest = countsDest.reduceByKey(_ + _)
+		      val freqPS = countsPortSource.reduceByKey(_ + _)
+		      val freqPD = countsPortDest.reduceByKey(_ + _)
+		      val freqProtocol = countsProtocol.reduceByKey(_ + _) 
+		      
+		      
+		      val top10Dest = freqDest.map(_.swap).top(10);
+		      val top10PS = freqPS.map(_.swap).top(10);
+		      val top10PD = freqPD.map(_.swap).top(10);
+		      val top10Protocol = freqProtocol.map(_.swap).top(10);
+		      print("Source: " + line._1 )
+		      for(line <- top10PS){ print(", Top 10 PortSource: "  + line) }
+		      for(line <- top10Dest){ print(", Top 10 dest: "  + line) }
+		      for(line <- top10PD){ print(", Top 10 PortDest: "  + line) }
+		      for(line <- top10Protocol){ print(", Top 10 Protocol: "  + line)  + "\n" }
 				}
-				
+
 		}
+		
+	
 }
