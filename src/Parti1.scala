@@ -22,7 +22,7 @@ class Parti1  extends java.io.Serializable{
 			val arrayOctetNumber = ArrayBuffer[Integer]()
 
 
-			def quest1_readFile(path : String){ 
+	def quest1_readFile(path : String){ 
 		//read file
 
 		val bufferedSource = Source.fromFile(path)
@@ -93,17 +93,20 @@ class Parti1  extends java.io.Serializable{
     
     					}
     			  else break
+					}
 		
 			    var meanDuree = sumDuree/arrayDuree.size
 					var meanPaquet = sumPaquet/arrayPackageNumber.size
 					var meanOctet = sumOctet/arrayOctetNumber.size
 
+					println( "LA COLLONE DUREE DE CONNEXION*********************************************" )
+					println( "Min: " + minDuree  + ", Max: " + maxDuree + ", Sum: " + sumDuree + ", Mean: "+ meanDuree )
+					println( "LA COLLONE PAQUET*********************************************************" ) 
+					println( "Min: " + minPaquet + ", Max: " + maxPaquet+ ", Sum: " + sumPaquet + ", Mean: "+ meanPaquet )
+					println( "LA COLLONE OCTET********************************************************** ATTENTION ERROR WHEN COMPILE UNDER 32 BITE , THE SUM > 2 BILLIONS" ) 
+					println( "Min: " + minOctet  + ", Max: " + maxOctet + ", Sum: " + sumOctet+ ", Mean: "+ meanOctet)
 		
-					println( "Durre Min, Max ,Sum , Mean: " + minDuree  + ", " + maxDuree + ", " + sumDuree + ", "+ meanDuree )
-					println( "Paquet Min, Max ,Sum , Mean: " + minPaquet + ", " + maxPaquet+ ", " + sumPaquet + ", "+ meanPaquet )
-					println( "Octer Min, Max ,Sum , Mean: " + minOctet  + ", " + maxOctet + ", " + sumOctet+ ", "+ meanOctet)
-		
-			}
+			
 	}
 
 	def quest5(path : String){
@@ -123,7 +126,7 @@ class Parti1  extends java.io.Serializable{
 					for ( line <- list.take(taille)){
 					  
 			  if(Calendar.getInstance().get(Calendar.MINUTE) <= endTime){
-						println(line) // (C1685,CompactBuffer((6,4,2749), (6,6,2980), (6,6,2972)))
+						//println(line) // (C1685,CompactBuffer((6,4,2749), (6,6,2980), (6,6,2972)))
 
 						var nbdeConnexion = 0 
 
@@ -150,8 +153,8 @@ class Parti1  extends java.io.Serializable{
 									meanPaquet = totalPaquet/v.size
 									meanOctet =  totalOctet/v.size
 						}	 
-
-						println( "Ordinateur source: " + line._1  + ", Duree Max:" + arrayDuree.max + ", Duree Min:" + 
+						println("***** Ordinateur source: " + line._1 +" *****")  
+						println( "Duree Max:" + arrayDuree.max + ", Duree Min:" + 
 								arrayDuree.min + ", Octet Min: "+ arrayOctet.min + ", Octet Max: "+ arrayOctet.max + ", Paquet Min:" + 
 								arrayPaquet.min + ", Octet Max: " + arrayPaquet.max + ", DureTotal: "+ totalDuree + ", PaquetTotal: "+ 
 								totalPaquet +", OctetTotal: " +  totalOctet +", DureMoyen: " + meanDure +",PaquetMoyen:"+ meanPaquet + ", OctetMoyen:" + meanOctet)	 
