@@ -8,6 +8,8 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.ListBuffer
 import java.util.Calendar
 import scala.util.control.Breaks._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.api.java.JavaRDD;
 
 class Parti1  extends java.io.Serializable{
 
@@ -21,26 +23,24 @@ class Parti1  extends java.io.Serializable{
 			val arrayPackageNumber = ArrayBuffer[Integer]()
 			val arrayOctetNumber = ArrayBuffer[Integer]()
 
+	val conf = new SparkConf().setAppName("Spark Scala WordCount Example").setMaster("local[1]") 
+	val sc = new SparkContext(conf)
 
 	def quest1_readFile(path : String){ 
 		//read file
-
+   	
 		val bufferedSource = Source.fromFile(path)
-		var compt = 1
 				for ( line <- bufferedSource.getLines){
-
 					val l = line.split(",")
-					arrayTimeStamp += l(0)
-					arrayDuree += l(1).toInt
-					arrayPcsource += l(2)
-					arrayPortSource += l(3)
-					arrayPcDest += l(4)
-					arrayPortDest += l(5)
-					arrayProtocol +=  l(6)
-					arrayPackageNumber += l(7).toInt
-					arrayOctetNumber += l(8).toInt
-					compt +=1
-					if(compt > 1000000) break
+					if(l(0) != "?") arrayTimeStamp += l(0) else arrayTimeStamp += "O";
+					if(l(1) != "?") arrayDuree += l(1).toInt else arrayDuree += 0;
+					if(l(1) != "?") arrayPcsource += l(2) else arrayPcsource += "0";
+					if(l(3) != "?") arrayPortSource += l(3) else  arrayPortSource += "0";
+					if(l(4) != "?") arrayPcDest += l(4) else arrayPcDest += "0";
+					if(l(5) != "?") arrayPortDest += l(5) else arrayPortDest += "0";
+					if(l(6) != "?") arrayProtocol +=  l(6) else arrayProtocol += "0";
+					if(l(7) != "?") arrayPackageNumber += l(7).toInt else arrayPackageNumber += 0;
+					if(l(8) != "?") arrayOctetNumber += l(8).toInt else arrayOctetNumber +=0;
 				}
 
 	}
@@ -53,9 +53,9 @@ class Parti1  extends java.io.Serializable{
 					val occ_PortDest = arrayPortDest.toSet
 					val occ_Protocol = arrayProtocol.toSet
 
-					println( "Occurence porte Source: " + occ_PortSource.size  + ", Taille of array porte source:  " + arrayPortSource.size)
-					println( "Occurence porte Dest: " + occ_PortDest.size  + ", Taille of array porte dest:  " + arrayPortDest.size)
-					println( "Occurence porte Protocol: " + occ_Protocol.size  + ", Taille of array protocol:  " + arrayProtocol.size)
+					println( "Le nombre d'occurrences port source: " + occ_PortSource.size);
+					println( "Le nombre d'occurrences port Desttination: " + occ_PortDest.size);
+					println( "Le nombre d'occurrences Protocol: " + occ_Protocol.size);
 	
 		  
 		
@@ -65,6 +65,7 @@ class Parti1  extends java.io.Serializable{
 	//get sum, mean, min max  of type collum numeric
 	def quest3_getCalcul(){
 
+	  //recupere le temps du systeme, et ajouter 5 min
 		var currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
 				var endTime = 0
 				if(currentMinute >= 55  && currentMinute <= 59){
@@ -73,7 +74,7 @@ class Parti1  extends java.io.Serializable{
 				else{
 					endTime = currentMinute +  5
 				}
-			//here var = varible , NOT use VAL 
+			
 			    var minDuree = arrayDuree.min
 					var maxDuree = arrayDuree.max
 					var minPaquet = arrayPackageNumber.min
@@ -99,11 +100,11 @@ class Parti1  extends java.io.Serializable{
 					var meanPaquet = sumPaquet/arrayPackageNumber.size
 					var meanOctet = sumOctet/arrayOctetNumber.size
 
-					println( "LA COLLONE DUREE DE CONNEXION*********************************************" )
+					println( "DUREE DE CONNEXION*********************************************" )
 					println( "Min: " + minDuree  + ", Max: " + maxDuree + ", Sum: " + sumDuree + ", Mean: "+ meanDuree )
-					println( "LA COLLONE PAQUET*********************************************************" ) 
+					println( "NOMBRE DE PAQUET***********************************************" ) 
 					println( "Min: " + minPaquet + ", Max: " + maxPaquet+ ", Sum: " + sumPaquet + ", Mean: "+ meanPaquet )
-					println( "LA COLLONE OCTET********************************************************** ATTENTION ERROR WHEN COMPILE UNDER 32 BITE , THE SUM > 2 BILLIONS" ) 
+					println( "NOMBRE d'OCTET************************************************* ATTENTION ERROR WHEN COMPILE UNDER 32 BITE , THE SUM > 2 BILLIONS" ) 
 					println( "Min: " + minOctet  + ", Max: " + maxOctet + ", Sum: " + sumOctet+ ", Mean: "+ meanOctet)
 		
 			
@@ -117,16 +118,13 @@ class Parti1  extends java.io.Serializable{
 				}
 				else{
 					endTime = currentMinute +  5
-				}
-			val conf = new SparkConf().setAppName("Spark Scala WordCount Example").setMaster("local[1]") 
-					val sc = new SparkContext(conf) 
+				} 
 					var list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(2),(fields(1),fields(7),fields(8)))).groupByKey()
 
 					var taille = list.count().toInt
 					for ( line <- list.take(taille)){
 					  
 			  if(Calendar.getInstance().get(Calendar.MINUTE) <= endTime){
-						//println(line) // (C1685,CompactBuffer((6,4,2749), (6,6,2980), (6,6,2972)))
 
 						var nbdeConnexion = 0 
 
@@ -154,10 +152,19 @@ class Parti1  extends java.io.Serializable{
 									meanOctet =  totalOctet/v.size
 						}	 
 						println("***** Ordinateur source: " + line._1 +" *****")  
-						println( "Duree Max:" + arrayDuree.max + ", Duree Min:" + 
-								arrayDuree.min + ", Octet Min: "+ arrayOctet.min + ", Octet Max: "+ arrayOctet.max + ", Paquet Min:" + 
-								arrayPaquet.min + ", Octet Max: " + arrayPaquet.max + ", DureTotal: "+ totalDuree + ", PaquetTotal: "+ 
-								totalPaquet +", OctetTotal: " +  totalOctet +", DureMoyen: " + meanDure +",PaquetMoyen:"+ meanPaquet + ", OctetMoyen:" + meanOctet)	 
+						println( "Nombre de Connection :"+ nbdeConnexion+ 
+                     "| Duree Min: " + arrayDuree.min + 
+						         ", Duree Max: " + arrayDuree.max + 
+						         ", DureTotal: "+ totalDuree + 
+						         ", DureMoyen: " + meanDure +
+						         "| Octet Min: "+ arrayOctet.min + 
+						         ", Octet Max: "+ arrayOctet.max + 
+						         ", OctetMoyen:" + meanOctet+
+						         ", OctetTotal: " +  totalOctet +
+						         "| Paquet Min:" + arrayPaquet.min + 
+						         ", Paquet Max: " + arrayPaquet.max + 
+						         ", PaquetMoyen:"+ meanPaquet + 
+						         ", PaquetTotal: "+ totalPaquet )	 
 					}		
 			  
 			  else break
@@ -166,9 +173,6 @@ class Parti1  extends java.io.Serializable{
 
 
 	def quest6_7(path : String){
-	  
-		val conf = new SparkConf().setAppName("Spark Scala WordCount Example").setMaster("local[1]") 
-	  val sc = new SparkContext(conf) 
 		val list = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(2),(fields(3),fields(4),fields(5), fields(6)))).groupByKey()
 		var taille = list.count().toInt
 		var currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
@@ -195,18 +199,18 @@ class Parti1  extends java.io.Serializable{
 								val freqProtocol = countsProtocol.reduceByKey(_ + _) 
 
 
-								val top10Dest = freqDest.map(_.swap).top(10);
+						val top10Dest = freqDest.map(_.swap).top(10);
 						val top10PS = freqPS.map(_.swap).top(10);
 						val top10PD = freqPD.map(_.swap).top(10);
 						val top10Protocol = freqProtocol.map(_.swap).top(10);
-						print("Source: " + line._1 )
-						print(", Top 10 PortSource: ")
+						print("Ordinateur Source: " + line._1 )
+						print("| Top 10 PortSource: ")
 						for(line <- top10PS){ print(line) }
-						print(", Top 10 dest: ")
+						print("| Top 10 Ordianteur Dest: ")
 						for(line <- top10Dest){ print(line) }
-						print(", Top 10 PortDest: ")
+						print("| Top 10 PortDest: ")
 						for(line <- top10PD){ print(line) }
-						print(", Top 10 Protocol: "  )
+						print("| Top 10 Protocol: "  )
 						for(line <- top10Protocol){ println(line) }
 					}
 			  else break

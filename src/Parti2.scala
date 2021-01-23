@@ -30,7 +30,7 @@ class Parti2 {
 		for ( line <- list.take(taille)){
 		  
 			  if(Calendar.getInstance().get(Calendar.MINUTE) <= endTime){
-		      println(line)
+		      println("Ordinateur Source: " +line._1._1  + " | Ordinateur Destination: " +line._1._2  + "| Nombre de Connexion: " + line._2)
 			  }
 			  
 			  else break
@@ -47,18 +47,38 @@ class Parti2 {
 		
 		val list3 = sc.textFile(path).map(line => line.split(",")).map(fields => (fields(2),fields(4), fields(5))).map(word => (word,1)).reduceByKey(_+_)
 		
-		var taille = list.count().toInt
-			for ( line <- list.take(taille)){
-		  println(line) 
+	  var currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
+		var endTime = 0
+		if(currentMinute >= 55  && currentMinute <= 59){
+			endTime = 5 - (60- currentMinute)
+		}
+		else{
+			endTime = currentMinute +  5
 		}
 		
+		var taille = list.count().toInt
+			for ( line <- list.take(taille)){
+			  
+			  if(Calendar.getInstance().get(Calendar.MINUTE) <= endTime){
+		      println("Ordinateur Source: " +line._1._1  + " | Ordinateur Destination: " +line._1._2  + " | Nom de Protocol: " + line._1._3 +" | Count : " + line._2)
+			  }else break;
+		}
+		endTime = endTime + 5;
 		var taille2 = list2.count().toInt
 			for ( line <- list2.take(taille)){
-		  println(line) 
+			  if(Calendar.getInstance().get(Calendar.MINUTE) <= endTime){
+		    println("Ordinateur Source: " +line._1._1  + " | Ordinateur Destination: " +line._1._2  + " | Port Source : " + line._1._3 +" | Count: " + line._2)
+			  }
+			  else break;
 		}
+		
+		endTime = endTime + 5;
 			var taille3 = list3.count().toInt
 			for ( line <- list3.take(taille)){
-		  println(line) 
+			  
+			  if(Calendar.getInstance().get(Calendar.MINUTE) <= endTime){
+		  println("Ordinateur Source: " +line._1._1  + " | Ordinateur Destination: " +line._1._2  + " | Port Destination : " + line._1._3 +" | Count: " + line._2)
+			  }else break;
 		}
   }
 }
