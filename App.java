@@ -1,10 +1,14 @@
 package ScalaProject.scala;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.graphx.Edge;
 import org.apache.spark.graphx.Graph;
 import org.apache.spark.storage.StorageLevel;
@@ -18,6 +22,8 @@ import scala.reflect.ClassTag;
  */
 public class App 
 {
+	
+	/********************Definition ***********/
 	static JavaSparkContext sc ; 
 	public SparkConf conf;
 	public List <String> sources ; 
@@ -31,7 +37,15 @@ public class App
 	public List <String> protocol ; 
 	public List <String> connexion ; 
 	public List <String> nbArc ; 
+	public List <String> inOutDegre ; 
 	public int moy ; 
+	Graph<String, String> graph;
+	 Graph<String, String> graph2;
+	 
+	 
+	 
+	 
+	 /****************Getter Setter***************************/
 	public int getMoy() {
 		return moy;
 	}
@@ -78,10 +92,9 @@ public class App
 	public int min ; 
 	public int stdv;
 	public int max ;
-	private boolean add; 
 	
-	
-	
+
+	//Constructeur
 	public App(){
 		sources = new ArrayList<String>();
 		destination = new ArrayList<String>();
@@ -94,12 +107,14 @@ public class App
 		protocol= new ArrayList<String>();
 		connexion = new ArrayList<String>();
 	    nbArc= new ArrayList<String>();
-		
+	    System.setProperty("hadoop.home.dir", "\\");
 		
 		 conf = new SparkConf().setAppName("Spark java").setMaster("local") ;
 	      sc  = new JavaSparkContext(conf);
 	}
 	
+	
+	//Lire un fichier de données 
 	public void CreatGraph(String path) {
 		List <String>source = new ArrayList<String>();
 
@@ -124,7 +139,7 @@ public class App
 		System.out.println("source : "+ source.get(1)+" Lines size" +lines.count());
 }
 	
-	/******************************************************/
+	/********************Q1**********************************/
 	//graph1 question 1
 	public int MaxPaqGraph( ) {
 		int max = 0; 
@@ -136,6 +151,9 @@ public class App
 		return max ; 
 	}
 	
+	
+	
+	//Min nombre paquet Graph 1
 	public int MinPaqGraph( ) {
 		int max = 0; 
 		for(int i = 0 ; i < connexion.size( ); i++) {
@@ -147,13 +165,16 @@ public class App
 		}
 		return max ; 
 	}
-	//Question 1 
+	
+	
+	//Question 1  Calcul somme min max dev moy 
 	public int NbConnection(String s , String d) {
 		
 		int nbConnexion =0;
 		this.setSum(0) ; 
 		this.setMin(-1 ) ; 
 		this.setMax(0); 
+		this.setMoy(0); 
 		String source ; 
 		String dest ;
 		
@@ -181,7 +202,7 @@ public class App
 		return nbConnexion;
 		
 	}
-	/**********************************************/
+	/******************  Creat Graph 1 ****************************/
 	//graph 1 question 2
 	public void CreatConnexionGraph() {
         ClassTag<String> stringTag = scala.reflect.ClassTag$.MODULE$.apply(String.class);
@@ -205,12 +226,12 @@ public class App
          vertRDD = sc.parallelize(vert);
          edgeRDD = sc.parallelize(lEdge);
 		
-        Graph<String, String> graph = Graph.apply( vertRDD.rdd(),edgeRDD.rdd(), "", StorageLevel.MEMORY_ONLY(),StorageLevel.MEMORY_ONLY(),stringTag, stringTag);    
+        this. graph = Graph.apply( vertRDD.rdd(),edgeRDD.rdd(), "", StorageLevel.MEMORY_ONLY(),StorageLevel.MEMORY_ONLY(),stringTag, stringTag);    
         graph.edges().saveAsTextFile("C:\\Users\\ileft\\\\OneDrive\\Desktop\\Master2\\bigdata\\Project big data\\echantillon-flows\\Lien.txt");        
         graph.vertices().toJavaRDD().collect().forEach(System.out::println);
       
 	}
-	/**********************************************/
+	/******************  Creat Graph 2 ****************************/
 	//graph 2 question 1
 	public void CreatConnexionGraph2() {
         ClassTag<String> stringTag = scala.reflect.ClassTag$.MODULE$.apply(String.class);
@@ -234,37 +255,73 @@ public class App
          vertRDD = sc.parallelize(vert);
          edgeRDD = sc.parallelize(lEdge);
 		
-        Graph<String, String> graph = Graph.apply( vertRDD.rdd(),edgeRDD.rdd(), "", StorageLevel.MEMORY_ONLY(),StorageLevel.MEMORY_ONLY(),stringTag, stringTag);    
-        graph.edges().saveAsTextFile("C:\\Users\\ileft\\\\OneDrive\\Desktop\\Master2\\bigdata\\Project big data\\echantillon-flows\\Lien.txt");        
-        graph.vertices().toJavaRDD().collect().forEach(System.out::println);
+        graph2= Graph.apply( vertRDD.rdd(),edgeRDD.rdd(), "", StorageLevel.MEMORY_ONLY(),StorageLevel.MEMORY_ONLY(),stringTag, stringTag);    
+        graph2.edges().saveAsTextFile("C:\\Users\\ileft\\\\OneDrive\\Desktop\\Master2\\bigdata\\Project big data\\echantillon-flows\\Lien.txt");        
+        graph2.vertices().toJavaRDD().collect().forEach(System.out::println);
       
 	}
-	/***************************************/
-	//Graph 1 question 3
-	public void CalculnbArc() {
-		int nbArc = 0;
-		for(int i =0 ; i<connexion.size() ; i++)
-		{
-			String[] line = connexion.get(i).split(",");
-		    this.nbArc.add(line[0]+","+this.CalculnbArc(line[0]));//sortant
-		    this.nbArc.add(line[1]+","+this.CalculnbArc(line[1]));//entrant
-			}
-		}
-		
 	
+	
+	/**
+	 * @return ***************Graph 1 Q3**********************/
+	//Calcul degree out sommet
+	public int  outtDegree(String sommet) {
+		List<String>couple = new ArrayList<String>();
+		int nbin =0 ; 
+		for(int i =0 ; i<connexion.size() ; i++)// je parcours la liste de connections
+		{
+			String[] line = connexion.get(i).split(",");		
+			/****************Q4***************/
+			 // Calcul Somme de question 4 
+			int n = NbConnection(line[0] ,line[1]);  // j'appelle la fonction qui calcul la somme la moyenne le min et le max 
+		
+			/*****************Continue Q3 ******************/				
+			if(line[0].equals(sommet)) {
+				if(!couple.contains(line[0]+","+line[1])){ // calcul nombre couple source destination distinct 
+					couple.add(line[0]+","+line[1]);
+					nbin++;
+					
+					
+				}
+			
+		}
+		}
+		System.out.println("Sum"+this.getSum()+""+ this.getMoy()+""+ this.getMin()+ ""+ this.getMax());	// affiche la somme final 
+		return nbin; 
+	}
 
-	public int CalculnbArc(String sommet) {
-		int nbArc = 0;
-		for(int i =0 ; i<connexion.size() ; i++)
+	
+	public int  intDegree(String sommet) {
+		List<String>couple = new ArrayList<String>();
+		int nbin =0 ; 
+		for(int i =0 ; i<connexion.size() ; i++)// je parcours la liste de connections
 		{
 			String[] line = connexion.get(i).split(",");
-			if(line[0].equals(sommet)) {
-				nbArc++;
+			if(line[1].equals(sommet)) {
+				if(!couple.contains(line[1]+","+line[0])){ // calcul nombre couple source destination distinct 
+					couple.add(line[1]+","+line[0]);
+					nbin++;
+				}
 			}
 		}
-		return nbArc;
+		return nbin; 
 	}
-       
+	
+	// nombre de relation distincts
+	public long InOutDeg() {
+		return this.graph.edges().distinct().count(); 
+	}
+	
+	
+	/*****************************Graph 2 Question 2 ****************************************/
+	public long InOutDeg2( ) {	
+
+	return this.graph2.edges().distinct().count() ; 
+	
+}
+	
+	/*********************************************************************/
+	
 	/**************************************
 	 * 
 	 */
@@ -287,11 +344,12 @@ public class App
     	
 	    	App a = new App();
 	    	
-	    	a.CreatGraph("C:\\Users\\ileft\\OneDrive\\Desktop\\Master2\bigdata\\Project big data\\echantillon-flows\\echantillon-flows.txt");
+	    	a.CreatGraph("C:\\Users\\ileft\\OneDrive\\Desktop\\Master2\\bigdata\\Project big data\\echantillon-flows\\echantillon-flows.txt");
 	    	int n = a.NbConnection("C20101","C5720");
-	    	System.out.println("yessssssssss"+n+ " sum "+ a.getSum()+"min"+a.getMin()+" max "+a.getMax() +" moy"+a.getMoy());
+	    	System.out.println("here "+n+ " sum "+ a.getSum()+"min"+a.getMin()+" max "+a.getMax() +" moy"+a.getMoy());
 	        System.out.println("Min "+ a.MinPaqGraph() + " max" + a.MaxPaqGraph());
-	        a.CreatConnexionGraph();
+	        a.CreatConnexionGraph(); //Creer graph 1 
+	        a.CreatConnexionGraph2();//Creer Graph 2 
     }
 }
 
