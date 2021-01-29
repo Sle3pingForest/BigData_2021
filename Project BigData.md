@@ -7,6 +7,7 @@ GIT : (https://github.com/Sle3pingForest/BigData_2021)
 
 # Intro:
 Le projet est séparer en deux parties: le Spark et la Graph. La première partie est realisée par Mr LY, et la deuxième est réalisée par Mme Trabelsi.
+Pour les fichier test, on a fait une avec 50 lignes, et une autres avec 1000000 lignes.
 
 ##Creation de project:
     - Sous eclipse, crée un scala project
