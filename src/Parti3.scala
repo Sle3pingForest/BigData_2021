@@ -52,7 +52,7 @@ class Parti3 {
 			endTime = 5 - (60- currentMinute)
 		}
 		else{
-			endTime = currentMinute +  5
+			endTime = currentMinute +  1
 		}
 		
 		var taille = list.count().toInt
@@ -61,7 +61,8 @@ class Parti3 {
 			  if(Calendar.getInstance().get(Calendar.MINUTE) <= endTime){
 		      println("Ordinateur Source: " +line._1._1  + " | Ordinateur Destination: " +line._1._2  + "| Nombre de Connexion: " + line._2)
 			  }
-			  else break
+			  else
+			  println("hello")
 		}
 		}
 		if(rep == 2){

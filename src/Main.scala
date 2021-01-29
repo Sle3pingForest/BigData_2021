@@ -14,7 +14,7 @@ object Main {
 		var choixf = "";
 
 		do{ 
-			System.out.println("Entrer le chemin du fichier de donné meme niveau que le programme");
+			System.out.println("Entrer le chemin du fichier de donné");
 			choixf= scf.nextLine();
 		}
 		while( choixf == "")
@@ -23,11 +23,14 @@ object Main {
 		var choix = 0;
 
 		do{ 
-			System.out.println("Choix entre: Partie I = 1 | Partie II = 2 | Partie II et IV = 3 ");
+			System.out.println("Choix entre: Partie I = 1 | Partie II = 2 | Partie III et IV = 3 ");
 			System.out.println("Veuillez saisir 1, 2 ou 3 : ");
 			choix= sc.nextInt();
 		}
 		while(choix !=1 && choix !=2  && choix !=3) ;
+		
+		
+		System.out.println("Veuilliez patiente pendant le chargement de donné du fichier data");
 		/**
 		 * PARTI I
 		 */
@@ -65,7 +68,7 @@ object Main {
 
 			do{ 
 				System.out.println("Choix des question:");
-				System.out.println("Veuillez saisir 1  = Quest 1_| 2 = Quest 2 |");
+				System.out.println("Veuillez saisir 1  = Quest 1| 2 = Quest 2 |");
 				choixq2= sc.nextInt();
 			}
 			while(choixq2 !=1 && choixq2 !=2) ;
