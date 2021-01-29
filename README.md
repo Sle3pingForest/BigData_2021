@@ -48,7 +48,7 @@ Partie 2.2: ( Correspondre au choix 2)
 Partie 2.3: ( Correspondre au choix 3)
     - meme technique avec le timer de la partie 2.1
 
-#### Frame Partie 
+#####Frame Partie 
 
 Fichier : App.java
 
