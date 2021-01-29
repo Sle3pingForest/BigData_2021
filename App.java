@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -227,7 +229,7 @@ public class App
          edgeRDD = sc.parallelize(lEdge);
 		
         this. graph = Graph.apply( vertRDD.rdd(),edgeRDD.rdd(), "", StorageLevel.MEMORY_ONLY(),StorageLevel.MEMORY_ONLY(),stringTag, stringTag);    
-        graph.edges().saveAsTextFile("C:\\Users\\ileft\\\\OneDrive\\Desktop\\Master2\\bigdata\\Project big data\\echantillon-flows\\Lien.txt");        
+       // graph.edges().saveAsTextFile("C:\\Users\\ileft\\\\OneDrive\\Desktop\\Master2\\bigdata\\Project big data\\echantillon-flows\\Lien.txt");        
         graph.vertices().toJavaRDD().collect().forEach(System.out::println);
       
 	}
@@ -343,8 +345,11 @@ public class App
     	  
     	
 	    	App a = new App();
-	    	
-	    	a.CreatGraph("C:\\Users\\ileft\\OneDrive\\Desktop\\Master2\\bigdata\\Project big data\\echantillon-flows\\echantillon-flows.txt");
+	    	Scanner scan = new Scanner(System.in);
+	    	System.out.println("Veuillez saisir le path de fichier Data :");
+	    	String path = scan.nextLine();
+	    	System.out.println("votre path est bien ?  : " + path);
+	    	a.CreatGraph(path);
 	    	int n = a.NbConnection("C20101","C5720");
 	    	System.out.println("here "+n+ " sum "+ a.getSum()+"min"+a.getMin()+" max "+a.getMax() +" moy"+a.getMoy());
 	        System.out.println("Min "+ a.MinPaqGraph() + " max" + a.MaxPaqGraph());
